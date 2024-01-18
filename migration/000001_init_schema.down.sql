@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS "phones";
+DROP TABLE IF EXISTS "users";
