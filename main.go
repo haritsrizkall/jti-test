@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	pkg.InitValidator()
+
 	r := mux.NewRouter()
 	r.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Healthy"))

@@ -1,11 +1,13 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/haritsrizkall/jti-test/domain"
+	"github.com/haritsrizkall/jti-test/pkg"
 	"github.com/haritsrizkall/jti-test/utils"
 )
 
@@ -62,6 +64,20 @@ func (h *PhoneHandler) Create(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// validate
+	err = pkg.Validate.Struct(request)
+	if err != nil {
+		// handle error
+		response := utils.Response{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+			Data:    nil,
+		}
+
+		utils.NewResponse(resp, response)
+		return
+	}
+
 	phone, err := h.PhoneUsecase.Create(ctx, request)
 	if err != nil {
 		// handle error
@@ -93,6 +109,21 @@ func (h *PhoneHandler) Update(resp http.ResponseWriter, req *http.Request) {
 		// handle error
 		response := utils.Response{
 			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+			Data:    nil,
+		}
+
+		utils.NewResponse(resp, response)
+		return
+	}
+
+	// validate
+	err = pkg.Validate.Struct(request)
+	if err != nil {
+		// handle error
+		fmt.Println(err)
+		response := utils.Response{
+			Status:  http.StatusBadRequest,
 			Message: err.Error(),
 			Data:    nil,
 		}

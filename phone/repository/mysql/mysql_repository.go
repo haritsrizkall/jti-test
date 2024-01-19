@@ -52,13 +52,9 @@ func (r *phoneRepository) GetByID(ctx context.Context, id int) (domain.Phone, er
 }
 
 func (r *phoneRepository) Update(ctx context.Context, phone domain.Phone) error {
-	result, err := r.db.ExecContext(ctx, UPDATE, phone.Number, phone.Provider, phone.ID)
+	_, err := r.db.ExecContext(ctx, UPDATE, phone.Number, phone.Provider, phone.ID)
 	if err != nil {
 		return err
-	}
-
-	if rowsAffected, _ := result.RowsAffected(); rowsAffected != 1 {
-		return errors.New(constant.ErrNotFound)
 	}
 
 	return nil

@@ -65,13 +65,8 @@ func (u *phoneUsecase) Update(ctx context.Context, request domain.UpdatePhoneReq
 	}
 
 	// validate phone
-	if !utils.IsValidProvider(phone.Provider) {
-		return nil, errors.New(constant.ErrInvalidProvider)
-	}
-	regexp := regexp.MustCompile(`^08[0-9]{9,13}$`)
-	if !regexp.MatchString(phone.Number) {
-		fmt.Println(phone.Number)
-		return nil, errors.New(constant.ErrInvalidPhoneNumber)
+	if !utils.IsValidProvider(phone.Provider) && !utils.IsValidPhoneNumber(phone.Number) {
+		return nil, errors.New(constant.ErrBadRequest)
 	}
 
 	err := u.phoneRepository.Update(ctx, phone)

@@ -26,14 +26,14 @@ type PhoneUsecase interface {
 
 // request
 type CreatePhoneRequest struct {
-	Number   string `json:"number"`
-	Provider string `json:"provider"`
+	Number   string `json:"number" validate:"required"`
+	Provider string `json:"provider" validate:"required"`
 }
 
 type UpdatePhoneRequest struct {
-	ID       int    `json:"id"`
-	Number   string `json:"number"`
-	Provider string `json:"provider"`
+	ID       int    `json:"id" validate:"required"`
+	Number   string `json:"number" validate:"required"`
+	Provider string `json:"provider" validate:"required"`
 }
 
 // response
