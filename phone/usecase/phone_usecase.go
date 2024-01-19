@@ -132,3 +132,15 @@ func (u *phoneUsecase) Delete(ctx context.Context, id int) (*domain.Phone, error
 
 	return response, nil
 }
+
+func (u *phoneUsecase) AutoGenerate(ctx context.Context) error {
+	count := 25
+	phones := utils.GeneratePhones(count)
+
+	err := u.phoneRepository.StoreBulk(ctx, phones)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

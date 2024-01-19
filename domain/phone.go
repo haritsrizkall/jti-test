@@ -14,6 +14,7 @@ type PhoneRepository interface {
 	GetByNumber(ctx context.Context, number string) (Phone, error)
 	Update(ctx context.Context, phone Phone) error
 	Store(ctx context.Context, phone Phone) (int, error)
+	StoreBulk(ctx context.Context, phones []Phone) error
 	Delete(ctx context.Context, id int) error
 }
 
@@ -23,6 +24,7 @@ type PhoneUsecase interface {
 	Update(ctx context.Context, request UpdatePhoneRequest) (*Phone, error)
 	Create(ctx context.Context, request CreatePhoneRequest) (*Phone, error)
 	Delete(ctx context.Context, id int) (*Phone, error)
+	AutoGenerate(ctx context.Context) error
 }
 
 // request

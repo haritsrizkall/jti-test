@@ -39,6 +39,7 @@ func main() {
 	r.HandleFunc("/api/phones/{id}", phoneHandler.Delete).Methods("DELETE")
 	r.HandleFunc("/api/phones", phoneHandler.GetAll).Methods("GET")
 	r.HandleFunc("/api/phones", phoneHandler.Create).Methods("POST")
+	r.HandleFunc("/api/phones/auto-generate", phoneHandler.AutoGenerate).Methods("POST")
 	r.HandleFunc("/api/phones/{id}", phoneHandler.Update).Methods("PUT")
 
 	log.Fatal(http.ListenAndServe(":8082", r))

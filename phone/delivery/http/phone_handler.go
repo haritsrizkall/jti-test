@@ -119,3 +119,15 @@ func (h *PhoneHandler) Delete(resp http.ResponseWriter, req *http.Request) {
 
 	utils.NewResponse(resp, http.StatusOK, "Success", phone)
 }
+
+func (h *PhoneHandler) AutoGenerate(resp http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	err := h.PhoneUsecase.AutoGenerate(ctx)
+	if err != nil {
+		utils.NewResponse(resp, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	utils.NewResponse(resp, http.StatusOK, "Success", nil)
+}

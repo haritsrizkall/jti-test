@@ -86,6 +86,34 @@ func (r *phoneRepository) Store(ctx context.Context, phone domain.Phone) (int, e
 	return int(lastInsertID), nil
 }
 
+func (r *phoneRepository) StoreBulk(ctx context.Context, phones []domain.Phone) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	stmt, err := tx.PrepareContext(ctx, STORE)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, phone := range phones {
+		_, err := stmt.ExecContext(ctx, phone.Number, phone.Provider)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *phoneRepository) Delete(ctx context.Context, id int) error {
 	result, err := r.db.ExecContext(ctx, DELETE, id)
 	if err != nil {
