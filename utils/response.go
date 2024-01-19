@@ -11,11 +11,16 @@ type Response struct {
 	Data    interface{} `json:"data"`
 }
 
-func NewResponse(w http.ResponseWriter, responseData Response) {
+func NewResponse(w http.ResponseWriter, status int, message string, data interface{}) {
+	responseData := Response{
+		Status:  status,
+		Message: message,
+		Data:    data,
+	}
 	w.Header().Set("Content-Type", "application/json")
-	data, _ := json.Marshal(responseData)
+	respJson, _ := json.Marshal(responseData)
 	w.WriteHeader(responseData.Status)
-	w.Write(data)
+	w.Write(respJson)
 }
 
 func DecodeBody(r *http.Request, data interface{}) error {

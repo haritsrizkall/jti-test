@@ -69,7 +69,15 @@ func (u *phoneUsecase) Update(ctx context.Context, request domain.UpdatePhoneReq
 		return nil, errors.New(constant.ErrBadRequest)
 	}
 
-	err := u.phoneRepository.Update(ctx, phone)
+	existPhone, err := u.phoneRepository.GetByNumber(ctx, phone.Number)
+	if err != nil && err.Error() != constant.ErrNoRowsInResultSet {
+		return nil, err
+	}
+	if existPhone.Number != "" && existPhone.ID != phone.ID {
+		return nil, errors.New(constant.ErrPhoneNumberExist)
+	}
+
+	err = u.phoneRepository.Update(ctx, phone)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +100,14 @@ func (u *phoneUsecase) Create(ctx context.Context, request domain.CreatePhoneReq
 	if !regexp.MatchString(phone.Number) {
 		fmt.Println(phone.Number)
 		return nil, errors.New(constant.ErrInvalidPhoneNumber)
+	}
+
+	existPhone, err := u.phoneRepository.GetByNumber(ctx, phone.Number)
+	if err != nil && err.Error() != constant.ErrNoRowsInResultSet {
+		return nil, err
+	}
+	if existPhone.Number != "" {
+		return nil, errors.New(constant.ErrPhoneNumberExist)
 	}
 
 	id, err := u.phoneRepository.Store(ctx, phone)

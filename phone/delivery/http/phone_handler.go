@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -26,25 +25,11 @@ func (h *PhoneHandler) GetAll(resp http.ResponseWriter, req *http.Request) {
 
 	phoneResponse, err := h.PhoneUsecase.GetAll(ctx)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: err.Error(),
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	// handle response
-	response := utils.Response{
-		Status:  http.StatusOK,
-		Message: "Success",
-		Data:    phoneResponse,
-	}
-
-	utils.NewResponse(resp, response)
+	utils.NewResponse(resp, http.StatusOK, "Success", phoneResponse)
 }
 
 func (h *PhoneHandler) Create(resp http.ResponseWriter, req *http.Request) {
@@ -53,51 +38,24 @@ func (h *PhoneHandler) Create(resp http.ResponseWriter, req *http.Request) {
 	var request domain.CreatePhoneRequest
 	err := utils.DecodeBody(req, &request)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: err.Error(),
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
 	// validate
 	err = pkg.Validate.Struct(request)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusBadRequest,
-			Message: err.Error(),
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	phone, err := h.PhoneUsecase.Create(ctx, request)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: err.Error(),
-			Data:    nil,
-		}
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	// handle response
-	response := utils.Response{
-		Status:  http.StatusOK,
-		Message: "Success",
-		Data:    phone,
-	}
-
-	utils.NewResponse(resp, response)
+	utils.NewResponse(resp, http.StatusOK, "Success", phone)
 }
 
 func (h *PhoneHandler) Update(resp http.ResponseWriter, req *http.Request) {
@@ -106,79 +64,37 @@ func (h *PhoneHandler) Update(resp http.ResponseWriter, req *http.Request) {
 	var request domain.UpdatePhoneRequest
 	err := utils.DecodeBody(req, &request)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: err.Error(),
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	// validate
 	err = pkg.Validate.Struct(request)
 	if err != nil {
-		// handle error
-		fmt.Println(err)
-		response := utils.Response{
-			Status:  http.StatusBadRequest,
-			Message: err.Error(),
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	id := mux.Vars(req)["id"]
 	if id == "" {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ID cannot be empty",
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, "ID cannot be empty", nil)
 		return
 	}
 
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ID must be integer",
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, "ID must be integer", nil)
 		return
 	}
 	request.ID = idInt
 
 	phone, err := h.PhoneUsecase.Update(ctx, request)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: err.Error(),
-			Data:    nil,
-		}
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	// handle response
-	response := utils.Response{
-		Status:  http.StatusOK,
-		Message: "Success",
-		Data:    phone,
-	}
-
-	utils.NewResponse(resp, response)
+	utils.NewResponse(resp, http.StatusOK, "Success", phone)
 }
 
 func (h *PhoneHandler) Delete(resp http.ResponseWriter, req *http.Request) {
@@ -186,47 +102,20 @@ func (h *PhoneHandler) Delete(resp http.ResponseWriter, req *http.Request) {
 
 	id := mux.Vars(req)["id"]
 	if id == "" {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ID cannot be empty",
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, "ID cannot be empty", nil)
 		return
 	}
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: "ID must be integer",
-			Data:    nil,
-		}
-
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusBadRequest, "ID must be integer", nil)
 		return
 	}
 
 	phone, err := h.PhoneUsecase.Delete(ctx, idInt)
 	if err != nil {
-		// handle error
-		response := utils.Response{
-			Status:  http.StatusInternalServerError,
-			Message: err.Error(),
-			Data:    nil,
-		}
-		utils.NewResponse(resp, response)
+		utils.NewResponse(resp, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	// handle response
-	response := utils.Response{
-		Status:  http.StatusOK,
-		Message: "Success",
-		Data:    phone,
-	}
-
-	utils.NewResponse(resp, response)
+	utils.NewResponse(resp, http.StatusOK, "Success", phone)
 }

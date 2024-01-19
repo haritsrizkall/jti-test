@@ -1,9 +1,11 @@
 package constant
 
 const (
-	ErrNotFound            = "Data not found"
-	ErrInternalServerError = "Internal server error"
-	ErrBadRequest          = "Bad request"
-	ErrInvalidPhoneNumber  = "Invalid phone number"
-	ErrInvalidProvider     = "Invalid provider"
+	ErrNotFound            = "data not found"
+	ErrInternalServerError = "internal server error"
+	ErrBadRequest          = "bad request"
+	ErrInvalidPhoneNumber  = "invalid phone number"
+	ErrInvalidProvider     = "invalid provider"
+	ErrPhoneNumberExist    = "phone number already exist"
+	ErrNoRowsInResultSet   = "sql: no rows in result set"
 )

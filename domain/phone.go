@@ -11,6 +11,7 @@ type Phone struct {
 type PhoneRepository interface {
 	GetAll(ctx context.Context) ([]Phone, error)
 	GetByID(ctx context.Context, id int) (Phone, error)
+	GetByNumber(ctx context.Context, number string) (Phone, error)
 	Update(ctx context.Context, phone Phone) error
 	Store(ctx context.Context, phone Phone) (int, error)
 	Delete(ctx context.Context, id int) error
