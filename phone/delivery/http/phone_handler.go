@@ -1,11 +1,14 @@
 package http
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/haritsrizkall/jti-test/domain"
+	phone_ws "github.com/haritsrizkall/jti-test/phone/websocket"
 	"github.com/haritsrizkall/jti-test/pkg"
 	"github.com/haritsrizkall/jti-test/utils"
 )
@@ -130,4 +133,25 @@ func (h *PhoneHandler) AutoGenerate(resp http.ResponseWriter, req *http.Request)
 	}
 
 	utils.NewResponse(resp, http.StatusOK, "Success", nil)
+}
+
+func (p *PhoneHandler) ServeWs(hub *phone_ws.Hub, w http.ResponseWriter, r *http.Request) {
+	upgrader := websocket.Upgrader{}
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	log.Println("Client Connected")
+
+	client := &phone_ws.Client{
+		Hub:  hub,
+		Conn: conn,
+		Send: make(chan []byte, 256),
+	}
+	client.Hub.Register <- client
+
+	go client.WritePump()
 }

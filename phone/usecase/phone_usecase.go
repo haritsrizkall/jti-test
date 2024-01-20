@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
@@ -9,16 +10,19 @@ import (
 
 	"github.com/haritsrizkall/jti-test/constant"
 	"github.com/haritsrizkall/jti-test/domain"
+	"github.com/haritsrizkall/jti-test/phone/websocket"
 	"github.com/haritsrizkall/jti-test/utils"
 )
 
 type phoneUsecase struct {
+	phoneHub        *websocket.Hub
 	phoneRepository domain.PhoneRepository
 }
 
-func NewPhoneUsecase(phoneRepository domain.PhoneRepository) domain.PhoneUsecase {
+func NewPhoneUsecase(phoneRepository domain.PhoneRepository, phoneHub *websocket.Hub) domain.PhoneUsecase {
 	return &phoneUsecase{
 		phoneRepository: phoneRepository,
+		phoneHub:        phoneHub,
 	}
 }
 
@@ -116,6 +120,10 @@ func (u *phoneUsecase) Create(ctx context.Context, request domain.CreatePhoneReq
 	}
 
 	phone.ID = id
+
+	// broadcast to all client
+	data, _ := json.Marshal(phone)
+	u.phoneHub.Broadcast <- data
 
 	return &phone, nil
 }
