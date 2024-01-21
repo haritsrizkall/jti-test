@@ -49,19 +49,19 @@
     <ul id="evenList"></ul>
   </div>
 
+  <audio src="/sounds/notif2.wav" autostart="0" id="notifSound"></audio>
+
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
-    // Perform AJAX GET request
+
     $.ajax({
       url: '/api/phones',
       method: 'GET',
       success: function(response) {
-        // Handle success response
         console.log(response);
         categorizeAndDisplay(response.data);
       },
       error: function(error) {
-        // Handle error
         console.error(error);
       }
     });
@@ -100,12 +100,19 @@
         socket.send('Hello, server!');
       });
   
+      function playSound() {
+        var notifSound = document.getElementById('notifSound');
+        notifSound.play();
+      }
+
       socket.addEventListener('message', (event) => {
         const receivedMessage = event.data;
         console.log('Message from server:', receivedMessage);
         var message = JSON.parse(receivedMessage);
 
         categorizeAndDisplay(message);
+        
+        playSound();
       });
   
       socket.addEventListener('close', (event) => {

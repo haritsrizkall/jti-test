@@ -88,6 +88,9 @@ func main() {
 		http.ServeFile(w, r, "./views/output.html")
 	}).Methods("GET")
 
+	// serve wav files on /sounds/notif.wav
+	r.PathPrefix("/sounds/").Handler(http.StripPrefix("/sounds/", http.FileServer(http.Dir("./sounds/"))))
+
 	// serve views/index.html
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./views/")))
 
