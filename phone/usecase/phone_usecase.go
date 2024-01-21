@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strconv"
 
 	"github.com/haritsrizkall/jti-test/constant"
 	"github.com/haritsrizkall/jti-test/domain"
@@ -26,30 +25,30 @@ func NewPhoneUsecase(phoneRepository domain.PhoneRepository, phoneHub *websocket
 	}
 }
 
-func (u *phoneUsecase) GetAll(ctx context.Context) (*domain.GetAllPhoneResponse, error) {
+func (u *phoneUsecase) GetAll(ctx context.Context) ([]domain.Phone, error) {
 	phones, err := u.phoneRepository.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var oddPhones []domain.Phone
-	var evenPhones []domain.Phone
+	// var oddPhones []domain.Phone
+	// var evenPhones []domain.Phone
 
-	for _, phone := range phones {
-		phoneInt, _ := strconv.Atoi(phone.Number[len(phone.Number)-1:])
-		if phoneInt%2 == 0 {
-			evenPhones = append(evenPhones, phone)
-		} else {
-			oddPhones = append(oddPhones, phone)
-		}
-	}
+	// for _, phone := range phones {
+	// 	phoneInt, _ := strconv.Atoi(phone.Number[len(phone.Number)-1:])
+	// 	if phoneInt%2 == 0 {
+	// 		evenPhones = append(evenPhones, phone)
+	// 	} else {
+	// 		oddPhones = append(oddPhones, phone)
+	// 	}
+	// }
 
-	response := &domain.GetAllPhoneResponse{
-		Odd:  oddPhones,
-		Even: evenPhones,
-	}
+	// response := &domain.GetAllPhoneResponse{
+	// 	Odd:  oddPhones,
+	// 	Even: evenPhones,
+	// }
 
-	return response, nil
+	return phones, nil
 }
 
 func (u *phoneUsecase) GetByID(ctx context.Context, id int) (*domain.Phone, error) {
@@ -122,8 +121,9 @@ func (u *phoneUsecase) Create(ctx context.Context, request domain.CreatePhoneReq
 	phone.ID = id
 
 	// broadcast to all client
-	data, _ := json.Marshal(phone)
-	u.phoneHub.Broadcast <- data
+	data := []domain.Phone{phone}
+	dataJson, _ := json.Marshal(data)
+	u.phoneHub.Broadcast <- dataJson
 
 	return &phone, nil
 }
@@ -145,10 +145,18 @@ func (u *phoneUsecase) AutoGenerate(ctx context.Context) error {
 	count := 25
 	phones := utils.GeneratePhones(count)
 
-	err := u.phoneRepository.StoreBulk(ctx, phones)
+	ids, err := u.phoneRepository.StoreBulk(ctx, phones)
 	if err != nil {
 		return err
 	}
+
+	for i := 0; i < count; i++ {
+		phones[i].ID = ids[i]
+	}
+
+	// broadcast to all client
+	data, _ := json.Marshal(phones)
+	u.phoneHub.Broadcast <- data
 
 	return nil
 }

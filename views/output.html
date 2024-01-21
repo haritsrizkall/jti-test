@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phone Number Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .section {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 45%;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="section" id="oddSection">
+    <h2>Odd Numbers</h2>
+    <ul id="oddList"></ul>
+  </div>
+
+  <div class="section" id="evenSection">
+    <h2>Even Numbers</h2>
+    <ul id="evenList"></ul>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    // Perform AJAX GET request
+    $.ajax({
+      url: '/api/phones',
+      method: 'GET',
+      success: function(response) {
+        // Handle success response
+        console.log(response);
+        categorizeAndDisplay(response.data);
+      },
+      error: function(error) {
+        // Handle error
+        console.error(error);
+      }
+    });
+
+    function categorizeAndDisplay(phoneNumbers) {
+      var oddList = $('#oddList');
+      var evenList = $('#evenList');
+
+      phoneNumbers.forEach(function(phoneNumber) {
+        var number = phoneNumber.number;
+      
+        var listItem = '<li>' + number + '</li>';
+
+        if (isOdd(number)) {
+          oddList.append(listItem);
+        } else {
+          evenList.append(listItem);
+        }
+      });
+    }
+
+    function isOdd(number) {
+      return number % 2 !== 0;
+    }
+  </script>
+    <script>
+      const messagesContainer = document.getElementById('messages');
+      const socket = new WebSocket('ws://172.24.101.226:8082/api/phones/ws');
+      var oddList = $('#oddList');
+      var evenList = $('#evenList');
+
+      // Connection opened
+      socket.addEventListener('open', (event) => {
+        console.log('WebSocket connection opened:', event);
+  
+        socket.send('Hello, server!');
+      });
+  
+      socket.addEventListener('message', (event) => {
+        const receivedMessage = event.data;
+        console.log('Message from server:', receivedMessage);
+        var message = JSON.parse(receivedMessage);
+
+        categorizeAndDisplay(message);
+      });
+  
+      socket.addEventListener('close', (event) => {
+        console.log('WebSocket connection closed:', event);
+      });
+  
+      socket.addEventListener('error', (event) => {
+        console.error('WebSocket connection error:', event);
+      });
+    </script>
+  
+</body>
+</html>

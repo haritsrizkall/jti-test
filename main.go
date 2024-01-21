@@ -81,6 +81,13 @@ func main() {
 	r.HandleFunc("/api/phones/auto-generate", phoneHandler.AutoGenerate).Methods("POST")
 	r.HandleFunc("/api/phones/{id}", phoneHandler.Update).Methods("PUT")
 
+	r.HandleFunc("/input", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./views/input.html")
+	}).Methods("GET")
+	r.HandleFunc("/output", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./views/output.html")
+	}).Methods("GET")
+
 	// serve views/index.html
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./views/")))
 
