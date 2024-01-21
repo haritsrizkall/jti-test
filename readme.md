@@ -7,7 +7,7 @@ You can run this code by 2 way:
 ## Run with docker-compose
 
 #### 1. Adjust .env
-Make sure to adjust .env before you build docker image or you can edit from docker-compose.yml (services.jti.environment).
+Make sure to adjust file .env before you build docker image or you can edit from docker-compose.yml (services.jti.environment).
 
 #### 2. Build docker image
 ```
@@ -33,7 +33,7 @@ Open the website (http://localhost:8082) on your favorite browser and make sure 
 You can find the file on this repo named jti_test.sql.
 
 #### 2. Adjust .env
-Make sure to adjust .env before you run the code.
+Make sure to adjust file .env before you run the code.
 
 #### 3. Run the code
 Please ensure that the environment variables in .env are correct.
