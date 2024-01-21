@@ -57,28 +57,10 @@
 <script>
 // JavaScript code using jQuery
 $(document).ready(function() {
-    // Replace 'YOUR_GOOGLE_API_ENDPOINT' with the actual API endpoint you want to call
     var googleLoginUrl = '/api/auth/login/google';
     $('#loginBtn').on('click', function() {
-        // Redirect to Google login page
         window.location.href = googleLoginUrl;
     });
-    // Click event for the button
-    // $('#loginBtn').on('click', function() {
-    //     // Perform AJAX GET request using jQuery
-    //     $.ajax({
-    //         url: apiEndpoint,
-    //         type: 'GET',
-    //         success: function(response) {
-    //             // Handle successful response
-    //             console.log('Response:', response);
-    //         },
-    //         error: function(xhr, status, error) {
-    //             // Handle error response
-    //             console.error('Error:', xhr.status, xhr.statusText);
-    //         }
-    //     });
-    // });
 });
 </script>
 

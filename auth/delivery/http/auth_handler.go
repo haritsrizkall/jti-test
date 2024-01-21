@@ -1,6 +1,7 @@
 package http
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/haritsrizkall/jti-test/domain"
@@ -29,7 +30,8 @@ func (h *AuthHandler) LoginWithGoogleCallback(resp http.ResponseWriter, req *htt
 	code := req.URL.Query().Get("code")
 	token, err := h.authUsecase.LoginWithGoogleCallback(ctx, code)
 	if err != nil {
-		http.Redirect(resp, req, "/login", http.StatusTemporaryRedirect)
+		log.Println(err)
+		http.Redirect(resp, req, "/", http.StatusTemporaryRedirect)
 		return
 	}
 

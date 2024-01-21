@@ -72,9 +72,9 @@
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
 
-    jQuery(document).ready(function() {
+    $(document).ready(function() {
       // first load
-      jQuery.ajax({
+      $.ajax({
         url: '/api/phones',
         method: 'GET',
         success: function(response) {
@@ -114,28 +114,6 @@
         var id = $(this).parent().attr('id');
         // redirect to edit page on new tab
         window.open('/edit/' + id, '_blank');
-        // get data with ajax
-        // $.ajax({
-        //   url: '/api/phones/' + id,
-        //   method: 'GET',
-        //   success: function(response) {
-        //     console.log(response);
-        //     var phoneNumber = response.data.number;
-        //     var provider = response.data.provider;
-        //     var listItem = $('#' + id);
-        //     listItem.find('p').remove();
-        //     listItem.find('.edit-btn').remove();
-        //     listItem.find('.delete-btn').remove();
-        //     listItem.append('<input type="text" class="edit-input" value="' + phoneNumber + '">');
-        //     listItem.append('<select class="edit-provider"> <option value="xl" ' + (provider === 'xl' ? 'selected' : '') + '>XL</option> <option value="tri" ' + (provider === 'tri' ? 'selected' : '') + '>TRI</option> <option value="telkomsel" ' + (provider === 'telkomsel' ? 'selected' : '') + '>Telkomsel</option> <option value="indosat" ' + (provider === 'indosat' ? 'selected' : '') + '>Indosat</option> </select>');
-        //     listItem.append('<button class="btn save-btn">Save</button>');
-        //     listItem.append('<button class="btn cancel-btn">Cancel</button>');
-        //   },
-        //   error: function(error) {
-        //     console.error(error);
-        //     alert('Error getting phone number');
-        //   }
-        // });
       });
 
       // delete phone number
@@ -148,8 +126,6 @@
           success: function(response) {
             console.log(response);
             alert('Phone number deleted successfully');
-            // remove list item
-            // $('#' + id).remove();
           },
           error: function(error) {
             console.error(error);
@@ -161,51 +137,51 @@
       // websocket
 
       const messagesContainer = document.getElementById('messages');
-    const socket = new WebSocket('ws://172.24.101.226:8082/api/phones/ws');
-    var oddList = $('#oddList');
-    var evenList = $('#evenList');
-    // Connection opened
-    socket.addEventListener('open', (event) => {
-      console.log('WebSocket connection opened:', event);
+      const socket = new WebSocket('ws://localhost:8082/api/phones/ws');
+      var oddList = $('#oddList');
+      var evenList = $('#evenList');
+      // Connection opened
+      socket.addEventListener('open', (event) => {
+        console.log('WebSocket connection opened:', event);
 
-      socket.send('Hello, server!');
-    });
+          socket.send('Hello, server!');
+        });
 
-    function playSound() {
-      var notifSound = document.getElementById('notifSound');
-      notifSound.play();
-    }
+        function playSound() {
+          var notifSound = document.getElementById('notifSound');
+          notifSound.play();
+        }
 
-    socket.addEventListener('message', (event) => {
-      const receivedMessage = event.data;
-      console.log('Message from server:', receivedMessage);
-      var message = JSON.parse(receivedMessage);
-      switch (message.type) {
-        case 'CREATE':
-          categorizeAndDisplay(message.data);
-          break;
-        case 'UPDATE':
-          $('#' + message.data.id).find('p').text(message.data.number);
-          console.log("UPDATED IITEM");
-          break;
-        case 'DELETE':
-          $('#' + message.data.id).remove();
-          console.log("DELETED ITEM");
-          break;
-        default:
-          break;
-      }
-      
-      playSound();
-    });
+        socket.addEventListener('message', (event) => {
+          const receivedMessage = event.data;
+          console.log('Message from server:', receivedMessage);
+          var message = JSON.parse(receivedMessage);
+          switch (message.type) {
+            case 'CREATE':
+              categorizeAndDisplay(message.data);
+              break;
+            case 'UPDATE':
+              $('#' + message.data.id).find('p').text(message.data.number);
+              console.log("UPDATED IITEM");
+              break;
+            case 'DELETE':
+              $('#' + message.data.id).remove();
+              console.log("DELETED ITEM");
+              break;
+            default:
+              break;
+          }
 
-    socket.addEventListener('close', (event) => {
-      console.log('WebSocket connection closed:', event);
-    });
+          playSound();
+        });
 
-    socket.addEventListener('error', (event) => {
-      console.error('WebSocket connection error:', event);
-    });
+        socket.addEventListener('close', (event) => {
+        console.log('WebSocket connection closed:', event);
+      });
+
+      socket.addEventListener('error', (event) => {
+        console.error('WebSocket connection error:', event);
+      });
     })
   </script>
 </body>

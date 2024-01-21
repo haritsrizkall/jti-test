@@ -1,0 +1,42 @@
+version: '3'
+name: 'jti-test'
+services: 
+  db:
+    image: mysql:8.0.26
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: abcd1234
+      MYSQL_DATABASE: default_schema
+      MYSQL_USER: jtitest
+      MYSQL_PASSWORD: abcd1234
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql:/var/lib/mysql
+  pma:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+  jti:
+    image: jtitest:latest
+    restart: always
+    ports:
+      - 8082:8082
+    environment:
+      - JWT_SECRET=abc5dasar
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=abcd1234
+      - DB_NAME=jti_test
+      - GOOGLE_CLIENT_ID=300037690726-0rp6igvqi3101qlltvan0n8m70b9i6q7.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      - GOOGLE_REDIRECT_URL=http://localhost:8082/api/auth/login/google/callback
+    depends_on:
+      - db
+volumes:
+  mysql:
