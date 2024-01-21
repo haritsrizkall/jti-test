@@ -6,12 +6,15 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
-	user_http "github.com/haritsrizkall/jti-test/phone/delivery/http"
-	user_mysql "github.com/haritsrizkall/jti-test/phone/repository/mysql"
-	"github.com/haritsrizkall/jti-test/phone/usecase"
+	auth_http "github.com/haritsrizkall/jti-test/auth/delivery/http"
+	auth_usecase "github.com/haritsrizkall/jti-test/auth/usecase"
+	"github.com/haritsrizkall/jti-test/middlewares"
+	phone_http "github.com/haritsrizkall/jti-test/phone/delivery/http"
+	phone_mysql "github.com/haritsrizkall/jti-test/phone/repository/mysql"
+	phone_usecase "github.com/haritsrizkall/jti-test/phone/usecase"
 	phone_ws "github.com/haritsrizkall/jti-test/phone/websocket"
 	"github.com/haritsrizkall/jti-test/pkg"
+	user_mysql "github.com/haritsrizkall/jti-test/user/repository/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -43,62 +46,56 @@ func main() {
 	phone_hub := phone_ws.NewHub()
 	go phone_hub.Run()
 
-	phoneRepository := user_mysql.NewPhoneRepository(db)
-	phoneUsecase := usecase.NewPhoneUsecase(phoneRepository, phone_hub)
-	phoneHandler := user_http.NewPhoneHandler(phoneUsecase)
+	googleOauth := pkg.NewGoogleOAuth(os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("GOOGLE_CLIENT_SECRET"), os.Getenv("GOOGLE_REDIRECT_URL"))
+
+	phoneRepository := phone_mysql.NewPhoneRepository(db)
+	userRepository := user_mysql.NewUserRepository(db)
+
+	phoneUsecase := phone_usecase.NewPhoneUsecase(phoneRepository, phone_hub)
+	authUsecase := auth_usecase.NewAuthUsecase(userRepository, *googleOauth)
+
+	authHandler := auth_http.NewAuthHandler(authUsecase)
+	phoneHandler := phone_http.NewPhoneHandler(phoneUsecase)
 
 	r.Use(mux.CORSMethodMiddleware(r))
 
-	upgrader := websocket.Upgrader{}
+	// auth
+	r.HandleFunc("/api/auth/login/google", authHandler.LoginWithGoogle).Methods("GET")
+	r.HandleFunc("/api/auth/login/google/callback", authHandler.LoginWithGoogleCallback).Methods("GET")
 
-	r.HandleFunc("/api/ws", func(w http.ResponseWriter, r *http.Request) {
-		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		log.Println("Client Connected")
-
-		for {
-			messageType, message, err := conn.ReadMessage()
-			if err != nil {
-				log.Println(err)
-				break
-			}
-
-			log.Println(string(message))
-
-			err = conn.WriteMessage(messageType, []byte("Selamat Makan"))
-			if err != nil {
-				log.Println(err)
-				break
-			}
-		}
-	})
-
+	// sub router phones
 	r.HandleFunc("/api/phones/ws", func(w http.ResponseWriter, r *http.Request) {
 		phoneHandler.ServeWs(phone_hub, w, r)
 	})
-	r.HandleFunc("/api/phones/{id}", phoneHandler.Delete).Methods("DELETE")
-	r.HandleFunc("/api/phones", phoneHandler.GetAll).Methods("GET")
-	r.HandleFunc("/api/phones", phoneHandler.Create).Methods("POST")
-	r.HandleFunc("/api/phones/auto-generate", phoneHandler.AutoGenerate).Methods("POST")
-	r.HandleFunc("/api/phones/{id}", phoneHandler.Update).Methods("PUT")
 
-	r.HandleFunc("/input", func(w http.ResponseWriter, r *http.Request) {
+	phoneRoute := r.PathPrefix("/api/phones").Subrouter()
+	phoneRoute.Use(middlewares.AuthMiddleware)
+	phoneRoute.HandleFunc("/{id}", phoneHandler.Delete).Methods("DELETE")
+	phoneRoute.HandleFunc("", phoneHandler.GetAll).Methods("GET")
+	phoneRoute.HandleFunc("/{id}", phoneHandler.GetByID).Methods("GET")
+	phoneRoute.HandleFunc("", phoneHandler.Create).Methods("POST")
+	phoneRoute.HandleFunc("/auto-generate", phoneHandler.AutoGenerate).Methods("POST")
+	phoneRoute.HandleFunc("/{id}", phoneHandler.Update).Methods("PUT")
+
+	// serve views
+	privateRoute := r.Methods(http.MethodGet).Subrouter()
+	privateRoute.Use(middlewares.AuthMiddleware)
+	privateRoute.HandleFunc("/input", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./views/input.html")
 	}).Methods("GET")
-	r.HandleFunc("/output", func(w http.ResponseWriter, r *http.Request) {
+	privateRoute.HandleFunc("/output", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./views/output.html")
+	}).Methods("GET")
+	privateRoute.HandleFunc("/edit/{id}", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./views/edit.html")
+	})
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./views/login.html")
 	}).Methods("GET")
 
 	// serve wav files on /sounds/notif.wav
 	r.PathPrefix("/sounds/").Handler(http.StripPrefix("/sounds/", http.FileServer(http.Dir("./sounds/"))))
-
-	// serve views/index.html
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./views/")))
 
 	log.Fatal(http.ListenAndServe(":8082", r))
 }

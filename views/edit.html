@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phone Number Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .input-form {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="phoneNumberForm">
+    <h3>Edit Phone Number</h3>
+    <div class="input-form">
+      <label for="phoneNumber">Phone Number:</label>
+      <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" required>
+    </div>
+
+    <div class="input-form">
+      <label for="provider">Provider:</label>
+      <select id="provider" name="provider">
+        <option value="xl">XL</option>
+        <option value="tri">TRI</option>
+        <option value="telkomsel">Telkomsel</option>
+        <option value="indosat">Indosat</option>
+      </select>
+    </div>
+
+    <div>
+      <button type="button">Submit</button>
+    </div>
+
+  </form>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // load phone number
+      // get id from parameter url
+      var urlParts = window.location.pathname.split('/');
+      var id = urlParts.pop();
+
+      $.ajax({
+        url: '/api/phones/' + id,
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        success: function(response) {
+          $('#phoneNumber').val(response.data.number);
+          $('option[value="' + response.data.provider + '"]').attr('selected', 'selected');
+        },
+        error: function(response) {
+          errorMsg = response.responseJSON.message;
+          alert('Error getting phone number. message: ' + errorMsg);
+        }
+      });
+
+      function submitForm() {
+        var phoneNumber = $('#phoneNumber').val();
+        var provider = $('#provider').val();
+
+        var data = {
+          number: phoneNumber,
+          provider: provider
+        };
+
+        $.ajax({
+          url: '/api/phones/' + id,
+          type: 'PUT', 
+          data: JSON.stringify(data),
+          contentType: 'application/json; charset=utf-8',
+          success: function(response) {
+            console.log(response);
+
+            $('#phoneNumber').val(response.data.number);
+            $("option[value='" + response.data.provider + "']").attr('selected', 'selected');
+            alert('Phone number updated successfully');
+          },
+          error: function(response) {
+            errorMsg = response.responseJSON.message;
+            alert('Error adding phone number. message: ' + errorMsg);
+          }
+        });
+      }
+      // submit form
+      $('#phoneNumberForm button').on('click', function() {
+        submitForm();
+      });
+    });
+  </script>
+</body>
+</html>

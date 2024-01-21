@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"github.com/haritsrizkall/jti-test/constant"
 	"github.com/haritsrizkall/jti-test/domain"
 	phone_ws "github.com/haritsrizkall/jti-test/phone/websocket"
 	"github.com/haritsrizkall/jti-test/pkg"
@@ -33,6 +34,31 @@ func (h *PhoneHandler) GetAll(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	utils.NewResponse(resp, http.StatusOK, "Success", phoneResponse)
+}
+
+func (h *PhoneHandler) GetByID(resp http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	id := mux.Vars(req)["id"]
+	if id == "" {
+		utils.NewResponse(resp, http.StatusBadRequest, "ID cannot be empty", nil)
+		return
+	}
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		utils.NewResponse(resp, http.StatusBadRequest, "ID must be integer", nil)
+		return
+	}
+
+	phone, err := h.PhoneUsecase.GetByID(ctx, idInt)
+	if err != nil {
+		if err.Error() == constant.ErrNoRowsInResultSet {
+			utils.NewResponse(resp, http.StatusNotFound, err.Error(), nil)
+			return
+		}
+	}
+
+	utils.NewResponse(resp, http.StatusOK, "Success", phone)
 }
 
 func (h *PhoneHandler) Create(resp http.ResponseWriter, req *http.Request) {

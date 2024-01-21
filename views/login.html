@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login with Google</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #loginContainer {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #loginBtn {
+            background-color: #4285f4;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #loginBtn:hover {
+            background-color: #3b79c1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- HTML content -->
+<div id="loginContainer">
+    <h1>Login with Google</h1>
+    <button id="loginBtn">Login with Google</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+// JavaScript code using jQuery
+$(document).ready(function() {
+    // Replace 'YOUR_GOOGLE_API_ENDPOINT' with the actual API endpoint you want to call
+    var googleLoginUrl = '/api/auth/login/google';
+    $('#loginBtn').on('click', function() {
+        // Redirect to Google login page
+        window.location.href = googleLoginUrl;
+    });
+    // Click event for the button
+    // $('#loginBtn').on('click', function() {
+    //     // Perform AJAX GET request using jQuery
+    //     $.ajax({
+    //         url: apiEndpoint,
+    //         type: 'GET',
+    //         success: function(response) {
+    //             // Handle successful response
+    //             console.log('Response:', response);
+    //         },
+    //         error: function(xhr, status, error) {
+    //             // Handle error response
+    //             console.error('Error:', xhr.status, xhr.statusText);
+    //         }
+    //     });
+    // });
+});
+</script>
+
+</body>
+</html>

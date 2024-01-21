@@ -85,6 +85,14 @@ func (u *phoneUsecase) Update(ctx context.Context, request domain.UpdatePhoneReq
 		return nil, err
 	}
 
+	// broadcast to all client
+	data := websocket.Message{
+		Type: "UPDATE",
+		Data: phone,
+	}
+	dataJson, _ := json.Marshal(data)
+	u.phoneHub.Broadcast <- dataJson
+
 	return &phone, nil
 }
 
@@ -121,7 +129,11 @@ func (u *phoneUsecase) Create(ctx context.Context, request domain.CreatePhoneReq
 	phone.ID = id
 
 	// broadcast to all client
-	data := []domain.Phone{phone}
+	phones := []domain.Phone{phone}
+	data := websocket.Message{
+		Type: "CREATE",
+		Data: phones,
+	}
 	dataJson, _ := json.Marshal(data)
 	u.phoneHub.Broadcast <- dataJson
 
@@ -137,6 +149,14 @@ func (u *phoneUsecase) Delete(ctx context.Context, id int) (*domain.Phone, error
 	response := &domain.Phone{
 		ID: id,
 	}
+
+	// broadcast to all client
+	data := websocket.Message{
+		Type: "DELETE",
+		Data: response,
+	}
+	dataJson, _ := json.Marshal(data)
+	u.phoneHub.Broadcast <- dataJson
 
 	return response, nil
 }
@@ -155,8 +175,12 @@ func (u *phoneUsecase) AutoGenerate(ctx context.Context) error {
 	}
 
 	// broadcast to all client
-	data, _ := json.Marshal(phones)
-	u.phoneHub.Broadcast <- data
+	data := websocket.Message{
+		Type: "CREATE",
+		Data: phones,
+	}
+	dataJson, _ := json.Marshal(data)
+	u.phoneHub.Broadcast <- dataJson
 
 	return nil
 }

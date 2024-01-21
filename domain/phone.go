@@ -34,7 +34,7 @@ type CreatePhoneRequest struct {
 }
 
 type UpdatePhoneRequest struct {
-	ID       int    `json:"id" validate:"required"`
+	ID       int    `json:"id"`
 	Number   string `json:"number" validate:"required"`
 	Provider string `json:"provider" validate:"required"`
 }

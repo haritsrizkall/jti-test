@@ -1,5 +1,10 @@
 package websocket
 
+type Message struct {
+	Type string      `json:"type"`
+	Data interface{} `json:"data"`
+}
+
 type Hub struct {
 	Clients    map[*Client]bool
 	Broadcast  chan []byte
