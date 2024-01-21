@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -11,9 +12,14 @@ import (
 	"github.com/haritsrizkall/jti-test/phone/usecase"
 	phone_ws "github.com/haritsrizkall/jti-test/phone/websocket"
 	"github.com/haritsrizkall/jti-test/pkg"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	pkg.InitValidator()
 
 	r := mux.NewRouter()
@@ -22,11 +28,11 @@ func main() {
 	})
 
 	mySqlDB := pkg.MySQL{
-		Host:     "localhost",
-		Port:     3306,
-		Database: "jti_test",
-		Username: "root",
-		Password: "florist123",
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Database: os.Getenv("DB_NAME"),
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
 	}
 
 	db, err := mySqlDB.Connect()

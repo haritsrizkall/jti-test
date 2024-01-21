@@ -9,14 +9,14 @@ import (
 
 type MySQL struct {
 	Host     string
-	Port     int
+	Port     string
 	Username string
 	Password string
 	Database string
 }
 
 func (m *MySQL) Connect() (*sql.DB, error) {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", m.Username, m.Password, m.Host, m.Port, m.Database))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", m.Username, m.Password, m.Host, m.Port, m.Database))
 	if err != nil {
 		return nil, err
 	}
