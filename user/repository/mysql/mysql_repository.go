@@ -21,7 +21,7 @@ func (r *mysqlRepository) GetByEmail(ctx context.Context, email string) (domain.
 	row := r.db.QueryRowContext(ctx, GET_BY_EMAIL, email)
 
 	var user domain.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -30,7 +30,7 @@ func (r *mysqlRepository) GetByEmail(ctx context.Context, email string) (domain.
 }
 
 func (r *mysqlRepository) Store(ctx context.Context, user domain.User) (int, error) {
-	result, err := r.db.ExecContext(ctx, STORE, user.Name, user.Email)
+	result, err := r.db.ExecContext(ctx, STORE, user.Name, user.Email, user.Password)
 	if err != nil {
 		return 0, err
 	}

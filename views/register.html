@@ -81,6 +81,10 @@
     <h1>Login</h1>
     <form id="loginForm">
         <div class="input-form">
+          <label for="email">Name :</label>
+          <input type="text" id="name" name="name" placeholder="Name" required>
+        </div>
+        <div class="input-form">
             <label for="email">Email :</label>
             <input type="text" id="email" name="email" placeholder="Email" required>
         </div>
@@ -90,9 +94,9 @@
         </div>
     </form>
     <div class="btn-group">
-        <button class="login-btn" id="loginBtn">Login</button>
+        <button class="login-btn" id="registerBtn">Register</button>
         <p>Or</p>
-        <button class="login-btn" id="loginGoogleBtn">Login with Google</button>
+        <button class="login-btn" id="loginBtn">Login</button>
     </div>
 </div>
 
@@ -101,16 +105,17 @@
 <script>
     // JavaScript code using jQuery
     $(document).ready(function() {
-        var googleLoginUrl = '/api/auth/login/google';
-        $('#loginGoogleBtn').on('click', function() {
-            window.location.href = googleLoginUrl;
+        $('#loginBtn').on('click', function() {
+            window.location.href = '/login';
         });
 
-        var loginUrl = '/api/auth/login';
-        $('#loginBtn').on('click', function () {
+        var loginUrl = '/api/auth/register';
+        $('#registerBtn').on('click', function () {
+            var name = $('#name').val();
             var email = $('#email').val();
             var password = $('#password').val();
             var data = {
+                name: name,
                 email: email,
                 password: password
             };
@@ -121,8 +126,8 @@
                 contentType: 'application/json; charset=utf-8',
                 success: function (result) {
                     console.log(result);
-                    alert('Login success');
-                    window.location.href = '/input';
+                    alert('Register success');
+                    window.location.href = '/';
                 },
                 error: function (response) {
                     errorMsg = response.responseJSON.message;

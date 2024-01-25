@@ -60,8 +60,11 @@ func main() {
 	r.Use(mux.CORSMethodMiddleware(r))
 
 	// auth
+	r.HandleFunc("/api/auth/register", authHandler.Register).Methods("POST")
+	r.HandleFunc("/api/auth/login", authHandler.Login).Methods("POST")
 	r.HandleFunc("/api/auth/login/google", authHandler.LoginWithGoogle).Methods("GET")
 	r.HandleFunc("/api/auth/login/google/callback", authHandler.LoginWithGoogleCallback).Methods("GET")
+	r.HandleFunc("/api/auth/logout", authHandler.Logout).Methods("POST")
 
 	// sub router phones
 	r.HandleFunc("/api/phones/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +95,9 @@ func main() {
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./views/login.html")
+	}).Methods("GET")
+	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./views/register.html")
 	}).Methods("GET")
 
 	// serve wav files on /sounds/notif.wav
