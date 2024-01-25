@@ -58,7 +58,7 @@
             flex-direction: column;
         }
 
-        .login-btn {
+        .btn {
             background-color: #4285f4;
             color: #fff;
             border: none;
@@ -67,9 +67,10 @@
             cursor: pointer;
             border-radius: 4px;
             display: inline-block;
+            margin-bottom: 2px;
         }
 
-        .login-btn:hover {
+        .btn:hover {
             background-color: #3b79c1;
         }
     </style>
@@ -90,9 +91,10 @@
         </div>
     </form>
     <div class="btn-group">
-        <button class="login-btn" id="loginBtn">Login</button>
+        <button class="btn" id="loginBtn">Login</button>
+        <button class="btn" id="registerBtn">Register</button>
         <p>Or</p>
-        <button class="login-btn" id="loginGoogleBtn">Login with Google</button>
+        <button class="btn" id="loginGoogleBtn">Login with Google</button>
     </div>
 </div>
 
@@ -105,6 +107,11 @@
         $('#loginGoogleBtn').on('click', function() {
             window.location.href = googleLoginUrl;
         });
+
+        var registerUrl = '/api/auth/register';
+        $('#registerBtn').on('click', function () {
+            window.location.href = '/register';
+        })
 
         var loginUrl = '/api/auth/login';
         $('#loginBtn').on('click', function () {
